@@ -114,18 +114,37 @@ public:
             
         }
     }
-    int findHeight(Node* root, int x)
-{
-    // Store the height of
-    // the given node
-    int h = -1;
+     int findTreeHeight() {
+        return findNodeHeight(root);
+    }
 
-    // Stores height of the Tree
-    int maxHeight = findHeightUtil(root, x, h);
+    int findNodeHeight(int nodeId) {
+        if (nodeId == -1) {
+            return -1;
+        }
 
-    // Return the height
-    return h;
-}
+        // Base case: leaf node
+        if (tree[nodeId].child_count == 0) {
+            return 0;
+        }
+
+        // Recursive case: internal node
+        int maxChildHeight = -1;
+        for (int i = 0; i < tree[nodeId].child_count; i++) {
+            int childHeight = findNodeHeight(tree[nodeId].children[i]);
+            maxChildHeight = std::max(maxChildHeight, childHeight);
+        }
+
+        return maxChildHeight + 1;
+    }
+
+    void calculateHeightForAllNodes() {
+        for (int i = 0; i < node_count; i++) {
+            tree[i].height = findNodeHeight(i);
+        }
+    }
+    
+
 
 };
 
