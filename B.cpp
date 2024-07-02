@@ -69,15 +69,18 @@ public:
             else if(left == -1 && right == -1) break;
             else {
                 temp[0] = left;
-                temp[0] = right;
+                temp[1] = right;
                 tree[id].reserveChildren(2);
             }
 
             for(int j = 0; j <tree[id].child_count;j++){
                 tree[id].children[j] = temp[j];
+                if (j > 0) {
+                    tree[temp[j]].sibling = temp[j - 1]; // Set sibling
+                }
                 tree[temp[j]].parent =  id;
             }
-            
+            delete[] temp;
         }
         findRoot();
     }
@@ -110,8 +113,7 @@ public:
         for (int i = 0; i < node_count; i++) {
             const char* nodeType = (tree[i].parent == -1) ? "root" :
                 (tree[i].child_count == 0) ? "leaf" : "internal node";
-            printf("node %d: parent = %d, degree = %d, depth = %d, %s, [", i, tree[i].parent,tree[i].child_count, tree[i].depth, nodeType);
-            
+            printf("node %d: parent = %d, degree = %d, depth = %d, height = %d %s\n", i, tree[i].parent,tree[i].child_count, tree[i].depth,tree[i].height, nodeType);
         }
     }
      int findTreeHeight() {
@@ -119,10 +121,6 @@ public:
     }
 
     int findNodeHeight(int nodeId) {
-        if (nodeId == -1) {
-            return -1;
-        }
-
         // Base case: leaf node
         if (tree[nodeId].child_count == 0) {
             return 0;
@@ -132,7 +130,7 @@ public:
         int maxChildHeight = -1;
         for (int i = 0; i < tree[nodeId].child_count; i++) {
             int childHeight = findNodeHeight(tree[nodeId].children[i]);
-            maxChildHeight = std::max(maxChildHeight, childHeight);
+            maxChildHeight =  (childHeight > maxChildHeight) ? childHeight : maxChildHeight;
         }
 
         return maxChildHeight + 1;
@@ -143,20 +141,17 @@ public:
             tree[i].height = findNodeHeight(i);
         }
     }
-    
-
-
 };
 
 int main() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(NULL);
-
     int n;
     scanf("%d", &n);
     BinaryTree nodesTree(n);
     nodesTree.readInputs();
     nodesTree.calculateDepth();
+    nodesTree.calculateHeightForAllNodes();
     nodesTree.printTreeNodes();
 
     return 0;
